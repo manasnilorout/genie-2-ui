@@ -6,11 +6,17 @@ import { KeyValuePair } from '../../types';
 interface HeadersSectionProps {
   headers: KeyValuePair[];
   onChange: (headers: KeyValuePair[]) => void;
+  isOpen?: boolean;
+  onToggle?: (isOpen: boolean) => void;
 }
 
-export function HeadersSection({ headers, onChange }: HeadersSectionProps) {
+export function HeadersSection({ headers, onChange, isOpen, onToggle }: HeadersSectionProps) {
   return (
-    <CollapsibleSection title="Headers">
+    <CollapsibleSection 
+      title="Headers" 
+      isOpen={isOpen}
+      onToggle={onToggle}
+    >
       <KeyValueEditor
         pairs={headers}
         onChange={onChange}

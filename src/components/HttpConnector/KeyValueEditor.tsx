@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
+import { PlaceholderInput } from '../ui/PlaceholderInput';
 import { KeyValuePair } from '../../types';
 
 interface KeyValueEditorProps {
@@ -33,16 +33,16 @@ export function KeyValueEditor({
     <div className="space-y-2">
       {pairs.map((pair, index) => (
         <div key={index} className="flex gap-2">
-          <Input
+          <PlaceholderInput
             placeholder="Key"
             value={pair.key}
-            onChange={(e) => handleChange(index, 'key', e.target.value)}
+            onChange={(value) => handleChange(index, 'key', value)}
             className="flex-1"
           />
-          <Input
+          <PlaceholderInput
             placeholder="Value"
             value={pair.value}
-            onChange={(e) => handleChange(index, 'value', e.target.value)}
+            onChange={(value) => handleChange(index, 'value', value)}
             className="flex-1"
           />
           <Button

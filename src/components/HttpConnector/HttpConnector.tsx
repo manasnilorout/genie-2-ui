@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Settings } from 'lucide-react';
 import { MethodSelector } from './MethodSelector';
 import { RequestUrlInput } from './RequestUrlInput';
@@ -8,7 +8,11 @@ import { BodyEditor } from './BodyEditor';
 import { Button } from '../ui/Button';
 import type { HttpRequest, KeyValuePair } from '../../types';
 
-export function HttpConnector() {
+interface HttpConnectorProps {
+  initialConfig?: Partial<HttpRequest>;
+}
+
+export function HttpConnector({ initialConfig }: HttpConnectorProps) {
   const [request, setRequest] = useState<HttpRequest>({
     method: 'POST',
     url: '',
@@ -19,6 +23,54 @@ export function HttpConnector() {
 
   const [headers, setHeaders] = useState<KeyValuePair[]>([]);
   const [queryParams, setQueryParams] = useState<KeyValuePair[]>([]);
+  
+  // State for controlling section expansion
+  const [isHeadersOpen, setIsHeadersOpen] = useState(false);
+  const [isQueryParamsOpen, setIsQueryParamsOpen] = useState(false);
+  
+  // State for highlighting retrieved values
+  const [isHighlighted, setIsHighlighted] = useState(false);
+
+  useEffect(() => {
+    if (initialConfig) {
+      setRequest(prev => ({
+        ...prev,
+        ...initialConfig
+      }));
+
+      if (initialConfig.headers) {
+        const headerPairs = Object.entries(initialConfig.headers).map(([key, value]) => ({
+          key,
+          value
+        }));
+        setHeaders(headerPairs);
+      }
+
+      if (initialConfig.queryParams) {
+        const queryPairs = Object.entries(initialConfig.queryParams).map(([key, value]) => ({
+          key,
+          value
+        }));
+        setQueryParams(queryPairs);
+      }
+
+      // Auto-expand sections if they have values and highlight the components
+      if (initialConfig.headers && Object.keys(initialConfig.headers).length > 0) {
+        setIsHeadersOpen(true);
+      }
+      
+      if (initialConfig.queryParams && Object.keys(initialConfig.queryParams).length > 0) {
+        setIsQueryParamsOpen(true);
+      }
+
+      // Enable highlighting when values are retrieved
+      if (initialConfig.method || initialConfig.url || 
+          (initialConfig.headers && Object.keys(initialConfig.headers).length > 0) ||
+          (initialConfig.queryParams && Object.keys(initialConfig.queryParams).length > 0)) {
+        setIsHighlighted(true);
+      }
+    }
+  }, [initialConfig]);
 
   const handleSubmit = () => {
     // TODO: Implement request submission
@@ -37,7 +89,7 @@ export function HttpConnector() {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Method
           </label>
-          <div className="flex gap-2">
+          <div className={`flex gap-2 ${isHighlighted ? 'ring-2 ring-blue-500 ring-opacity-50 rounded-md p-2 bg-blue-50' : ''}`}>
             <MethodSelector
               value={request.method}
               onChange={(method) => setRequest({ ...request, method })}
@@ -62,11 +114,15 @@ export function HttpConnector() {
         <HeadersSection
           headers={headers}
           onChange={setHeaders}
+          isOpen={isHeadersOpen}
+          onToggle={setIsHeadersOpen}
         />
 
         <QueryParamsSection
           params={queryParams}
           onChange={setQueryParams}
+          isOpen={isQueryParamsOpen}
+          onToggle={setIsQueryParamsOpen}
         />
 
         <Button

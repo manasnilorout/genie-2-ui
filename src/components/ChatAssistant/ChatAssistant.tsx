@@ -1,20 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
-import type { ChatMessage as ChatMessageType } from '../../types';
+import { useChatAssistant } from '../../hooks/useChatAssistant';
 
-export function ChatAssistant() {
-  const [messages, setMessages] = useState<ChatMessageType[]>([]);
+interface ChatAssistantProps {
+  onConfigUpdate?: (config: Record<string, unknown>) => void;
+}
+
+export function ChatAssistant({ onConfigUpdate }: ChatAssistantProps) {
+  const { messages, sendMessage, isLoading } = useChatAssistant();
 
   const handleSend = (content: string) => {
-    const newMessage: ChatMessageType = {
-      id: Date.now().toString(),
-      content,
-      role: 'user',
-      timestamp: new Date()
-    };
-    setMessages([...messages, newMessage]);
-    // TODO: Implement chat assistant response
+    sendMessage(content, onConfigUpdate);
   };
 
   return (
@@ -25,7 +22,7 @@ export function ChatAssistant() {
         ))}
       </div>
       <div className="border-t p-4">
-        <ChatInput onSend={handleSend} />
+        <ChatInput onSend={handleSend} disabled={isLoading} />
       </div>
     </div>
   );

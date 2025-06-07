@@ -17,3 +17,43 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   timestamp: Date;
 }
+
+export interface AIParseResponse {
+  success: boolean;
+  message: string;
+  timestamp: string;
+  input: string;
+  intent: {
+    vendor: string;
+    action: string;
+    parameters: Array<{
+      key: string;
+      value: string;
+    }>;
+    confidence: number;
+  };
+  schema: {
+    actionName: string;
+    actionType: string;
+    baseUrl: string;
+    actionUrl: string;
+    actionHeaders: Array<{
+      key: string;
+      value: string;
+    }>;
+    actionQueryParams?: Array<{
+      key: string;
+      value: string;
+    }>;
+    actionBody: Record<string, unknown>;
+    actionBodyType: string;
+    authConfig: {
+      type: string;
+      config: Array<{
+        key: string;
+        value: string;
+      }>;
+    };
+    confidence: number;
+  };
+}

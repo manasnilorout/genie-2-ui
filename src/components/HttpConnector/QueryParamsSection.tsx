@@ -6,11 +6,17 @@ import { KeyValuePair } from '../../types';
 interface QueryParamsSectionProps {
   params: KeyValuePair[];
   onChange: (params: KeyValuePair[]) => void;
+  isOpen?: boolean;
+  onToggle?: (isOpen: boolean) => void;
 }
 
-export function QueryParamsSection({ params, onChange }: QueryParamsSectionProps) {
+export function QueryParamsSection({ params, onChange, isOpen, onToggle }: QueryParamsSectionProps) {
   return (
-    <CollapsibleSection title="Query parameters">
+    <CollapsibleSection 
+      title="Query parameters"
+      isOpen={isOpen}
+      onToggle={onToggle}
+    >
       <KeyValueEditor
         pairs={params}
         onChange={onChange}

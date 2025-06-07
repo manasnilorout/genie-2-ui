@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input } from '../ui/Input';
+import { PlaceholderInput } from '../ui/PlaceholderInput';
 import { Globe } from 'lucide-react';
 
 interface RequestUrlInputProps {
@@ -10,11 +10,11 @@ interface RequestUrlInputProps {
 export function RequestUrlInput({ value, onChange }: RequestUrlInputProps) {
   return (
     <div className="space-y-1">
-      <Input
+      <PlaceholderInput
         icon={Globe}
         placeholder="https://example.com/path"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={onChange}
       />
       <p className="text-sm text-gray-500">
         Write the full path (https://example.com/path)

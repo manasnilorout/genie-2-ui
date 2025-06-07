@@ -1,5 +1,5 @@
 import React from 'react';
-import { DivideIcon as LucideIcon } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: LucideIcon;
@@ -21,10 +21,11 @@ export function Input({
       )}
       <input
         className={`
-          block w-full rounded-md border-gray-300 shadow-sm
-          focus:border-blue-500 focus:ring-blue-500 sm:text-sm
+          block w-full rounded-md border border-gray-300 shadow-sm
+          focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20
+          sm:text-sm py-2 pr-3 bg-white hover:border-gray-400 transition-colors
           ${Icon ? 'pl-10' : 'pl-3'}
-          ${error ? 'border-red-300' : 'border-gray-300'}
+          ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}
           ${className}
         `}
         {...props}
