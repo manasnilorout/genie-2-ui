@@ -1,14 +1,79 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import io from 'socket.io-client';
 import { ChatMessage, AIParseResponse } from '../types';
 
 export const useChatAssistant = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const socketRef = useRef<any>(null);
+  const currentThinkingIdRef = useRef<string | null>(null);
+
+  // Initialize websocket connection
+  useEffect(() => {
+    socketRef.current = io('ws://localhost:3030', {
+      transports: ['websocket'],
+    });
+
+    socketRef.current.on('connect', () => {
+      console.log('Connected to websocket');
+    });
+
+    socketRef.current.on('log', (data: {
+      timestamp: string;
+      level: string;
+      message: string;
+      context?: string;
+      promptLength?: number;
+      requestId?: string;
+      method?: string;
+      url?: string;
+      userAgent?: string;
+      ip?: string;
+    }) => {
+      // Only show relevant log messages (info level and above, with meaningful context)
+      if (data.level === 'info' || data.level === 'warn' || data.level === 'error' || data.level === 'debug') {
+        const thinkingId = 'thinking-current';
+        currentThinkingIdRef.current = thinkingId;
+
+        // Create a readable message from the log data
+        let displayMessage = data.message;
+        if (data.context) {
+          displayMessage = `[${data.context}] ${data.message}`;
+        }
+
+        setMessages(prev => {
+          // Remove previous thinking message if it exists
+          const filteredMessages = prev.filter(msg => !msg.isThinking);
+          
+          // Add new thinking message
+          const thinkingMessage: ChatMessage = {
+            id: thinkingId,
+            content: displayMessage,
+            role: 'thinking',
+            timestamp: new Date(data.timestamp),
+            isThinking: true,
+          };
+
+          return [...filteredMessages, thinkingMessage];
+        });
+      }
+    });
+
+    socketRef.current.on('disconnect', () => {
+      console.log('Disconnected from websocket');
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, []);
 
   const parseIntent = async (prompt: string): Promise<AIParseResponse | null> => {
     try {
       setIsLoading(true);
-      const response = await fetch('http://localhost:3030/api/v1/http/schema', {
+      const response = await fetch('http://localhost:3030/api/v1/http/perplexity/schema', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,7 +116,12 @@ export const useChatAssistant = () => {
           timestamp: new Date(),
         };
 
-        setMessages(prev => [...prev, assistantMessage]);
+        // Remove thinking message and add assistant response
+        setMessages(prev => {
+          const filteredMessages = prev.filter(msg => !msg.isThinking);
+          return [...filteredMessages, assistantMessage];
+        });
+        currentThinkingIdRef.current = null;
 
         if (onConfigUpdate) {
           const httpConfig = {
@@ -76,16 +146,27 @@ export const useChatAssistant = () => {
           role: 'assistant',
           timestamp: new Date(),
         };
-        setMessages(prev => [...prev, errorMessage]);
+        // Remove thinking message and add error response
+        setMessages(prev => {
+          const filteredMessages = prev.filter(msg => !msg.isThinking);
+          return [...filteredMessages, errorMessage];
+        });
+        currentThinkingIdRef.current = null;
       }
-    } catch {
+    } catch (error) {
+      console.error('Error sending message:', error);
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         content: "Sorry, I encountered an error while processing your request. Please try again.",
         role: 'assistant',
         timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      // Remove thinking message and add error response
+      setMessages(prev => {
+        const filteredMessages = prev.filter(msg => !msg.isThinking);
+        return [...filteredMessages, errorMessage];
+      });
+      currentThinkingIdRef.current = null;
     }
   };
 

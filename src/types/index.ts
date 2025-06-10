@@ -14,8 +14,9 @@ export interface KeyValuePair {
 export interface ChatMessage {
   id: string;
   content: string;
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'thinking';
   timestamp: Date;
+  isThinking?: boolean;
 }
 
 export interface AIParseResponse {
@@ -45,7 +46,13 @@ export interface AIParseResponse {
       key: string;
       value: string;
     }>;
-    actionBody: Record<string, unknown>;
+    actionBody?: {
+      actionBody?: Record<string, unknown>;
+      actionQueryParams?: Array<{
+        key: string;
+        value: string;
+      }>;
+    };
     actionBodyType: string;
     authConfig: {
       type: string;
