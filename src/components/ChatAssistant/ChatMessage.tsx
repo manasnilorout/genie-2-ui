@@ -9,6 +9,15 @@ export function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === 'user';
   const isThinking = message.role === 'thinking';
 
+  const isUrl = (text: string) => {
+    try {
+      new URL(text);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
       <div
@@ -33,6 +42,33 @@ export function ChatMessage({ message }: ChatMessageProps) {
           </div>
         )}
         <div className="break-words whitespace-pre-wrap">{message.content}</div>
+        {message.citations && message.citations.length > 0 && (
+          <div className="mt-2 pt-2 border-t border-gray-200">
+            <div className="text-xs font-medium text-gray-500 mb-1">Citations:</div>
+            <div className="space-y-1">
+              {message.citations.map((citation, index) => (
+                isUrl(citation) ? (
+                  <a
+                    key={index}
+                    href={citation}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-xs text-blue-600 hover:text-blue-800 hover:underline truncate"
+                  >
+                    {citation}
+                  </a>
+                ) : (
+                  <div
+                    key={index}
+                    className="block text-xs text-gray-600"
+                  >
+                    {citation}
+                  </div>
+                )
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
