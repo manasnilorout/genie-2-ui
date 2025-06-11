@@ -133,7 +133,7 @@ export const useChatAssistant = () => {
               return acc;
             }, {} as Record<string, string>),
             body: JSON.stringify(parseResult.schema.actionBody || {}),
-            queryParams: parseResult.schema.actionBody?.actionQueryParams?.reduce((acc, param) => {
+            queryParams: parseResult.schema.actionQueryParams?.reduce((acc, param) => {
               acc[param.key] = param.value;
               return acc;
             }, {} as Record<string, string>),
