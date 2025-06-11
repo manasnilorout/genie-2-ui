@@ -14,6 +14,7 @@ export interface KeyValuePair {
 export interface ChatMessage {
   id: string;
   content: string;
+  citations?: Array<string>;
   role: 'user' | 'assistant' | 'thinking';
   timestamp: Date;
   isThinking?: boolean;
