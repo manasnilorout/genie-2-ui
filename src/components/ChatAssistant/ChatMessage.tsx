@@ -11,8 +11,16 @@ export function ChatMessage({ message }: ChatMessageProps) {
 
   const isUrl = (text: string) => {
     try {
-      new URL(text);
-      return true;
+      const urlPattern = new RegExp(
+        '^(https?:\\/\\/)?' + // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+        '(\\#[-a-z\\d_]*)?$', // fragment locator
+        'i'
+      );
+      return urlPattern.test(text);
     } catch {
       return false;
     }
@@ -31,7 +39,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
           }
         `}
       >
-        {isThinking && (
+        {isThinking && message.content && (
           <div className="flex items-center gap-2 mb-1">
             <div className="flex space-x-1">
               <div className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce"></div>
