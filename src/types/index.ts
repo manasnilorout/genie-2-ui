@@ -61,6 +61,7 @@ export interface AIParseResponse {
         value: string;
       }>;
     };
+    citations: Array<string>;
     confidence: number;
   };
 }

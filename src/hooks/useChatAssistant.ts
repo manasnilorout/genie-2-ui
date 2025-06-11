@@ -111,7 +111,7 @@ export const useChatAssistant = () => {
       if (parseResult && parseResult.success) {
         const assistantMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
-          content: `I've parsed your request for "${parseResult.intent.action}" with ${parseResult.intent.vendor}. Would you like me to populate the HTTP connector with these details?`,
+          content: `I've parsed your request for "${parseResult.intent.action}" with ${parseResult.intent.vendor}. Citations Used: ${parseResult.schema.citations.join(', ')}`,
           role: 'assistant',
           timestamp: new Date(),
         };
