@@ -17,7 +17,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
           ${isUser 
             ? 'bg-blue-600 text-white' 
             : isThinking 
-              ? 'bg-yellow-50 text-yellow-800 border border-yellow-200 animate-pulse' 
+              ? 'bg-yellow-50 text-yellow-800 border border-yellow-200 animate-pulse break-words whitespace-pre-wrap' 
               : 'bg-gray-100 text-gray-900'
           }
         `}
@@ -32,7 +32,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
             <span className="text-xs font-medium">Agent thinking...</span>
           </div>
         )}
-        {message.content}
+        <div className="break-words whitespace-pre-wrap">{message.content}</div>
       </div>
     </div>
   );
