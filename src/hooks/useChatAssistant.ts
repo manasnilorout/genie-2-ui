@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import { ChatMessage, AIParseResponse } from '../types';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3030';
+
 export const useChatAssistant = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -10,7 +12,8 @@ export const useChatAssistant = () => {
 
   // Initialize websocket connection
   useEffect(() => {
-    socketRef.current = io('ws://localhost:3030', {
+    const wsUrl = API_BASE_URL.replace(/^http/, 'ws');
+    socketRef.current = io(wsUrl, {
       transports: ['websocket'],
     });
 
@@ -73,7 +76,7 @@ export const useChatAssistant = () => {
   const parseIntent = async (prompt: string): Promise<AIParseResponse | null> => {
     try {
       setIsLoading(true);
-      const response = await fetch('http://localhost:3030/api/v1/http/perplexity/schema', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/http/perplexity/schema`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
